@@ -6,75 +6,87 @@
 #include <unistd.h>
 #include <netinet/in.h>
 
-#define BUFFSIZE 255
+#define MAXPENDING 5    /* Maximum number of simultaneous connections */
+#define BUFFSIZE 5      /* Size of message to be reeived */
 
-void err_sys(char *mess)
-{
-    perror(mess);
-    exit(1);
+void handle_client(int sock);
+
+void err_sys(char *mess) { perror(mess); exit(1); }
+
+void handle_client(int sock) {
+    fprintf(stdout, "Maricon3");
+  char buffer[BUFFSIZE];
+  int received = -1;
+
+  /* Read from socket */
+  read(sock, &buffer[0], BUFFSIZE);
+  printf("Message from client: %s\n", buffer);
+
+  /* Write to socket */
+  write(sock, buffer, strlen(buffer) + 1);
+
+  /* Close socket */
+  close(sock);
 }
 
-int main(int argc, char *argv[])
-{
-    struct sockaddr_in echoserver, echoclient;
-    unsigned int echolen, clientlen, serverlen;
-    char buffer[BUFFSIZE];
-    int sock, result;
-    int received = 0;
+int main(int argc, char *argv[]) {
+  struct sockaddr_in echoserver, echoclient;
+  int serversock, clientsock;
+  int result;
 
-    /* Check input arguments */
-    if (argc != 3)
-    {
-        fprintf(stderr, "Usage: %s <ip_server> <port>\n", argv[0]);
-        exit(1);
+  /* Check input arguments */
+  if (argc != 2) {
+    fprintf(stderr, "Usage: %s <port>\n", argv[0]);
+    exit(1);
+  }
+
+  /* Create TCP socket */
+  serversock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+  if (serversock < 0) {
+    err_sys("Error socket");
+  }
+
+  /* Set information for sockaddr_in structure */
+  memset(&echoserver, 0, sizeof(echoserver));       /* Reset memory */
+  echoserver.sin_family = AF_INET;                  /* Internet/IP */
+  echoserver.sin_addr.s_addr = htonl(INADDR_ANY);   /* Any address */
+  echoserver.sin_port = htons(atoi(argv[1]));       /* Server port */
+
+  /* Bind socket */
+  result = bind(serversock, (struct sockaddr *) &echoserver, sizeof(echoserver));
+  if (result < 0) {
+    err_sys("Error bind");
+  }
+
+  /* Listen socket */
+  result = listen(serversock, MAXPENDING);
+  if (result < 0) {
+    err_sys("Error listen");
+  }
+
+  /* As a server we are in an infinite loop, waiting forever */
+  while (1) {
+    unsigned int clientlen = sizeof(echoclient);
+
+    /* Wait for a connection from a client */
+    printf("Listening...\n");
+    clientsock = accept(serversock, (struct sockaddr *) &echoclient, &clientlen);
+    if (clientsock < 0) {
+      err_sys("Error accept");
     }
+    fprintf(stdout, "test1\n");
+    char* ip = inet_ntoa(echoclient.sin_addr);
+    fprintf(stdout, "test2\n");
+    fprintf(stdout, "Client: %s\n", ip);
 
-    /* Create UDP socket */
-    sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (sock < 0)
-    {
-        err_sys("Error socket");
-    }
+    fprintf(stdout, "test3\n");
 
-    /* Prepare sockaddr_in structure for server address */
-    memset(&echoserver, 0, sizeof(echoserver));      /* Erase the memory area */
-    echoserver.sin_family = AF_INET;                 /* Internet/IP */
-    echoserver.sin_addr.s_addr = inet_addr(argv[1]); /* Receive message only to that IP on server */
-    // echoserver.sin_addr.s_addr = htonl(INADDR_ANY); /* Receive requests from any IP address valid on server */
-    echoserver.sin_port = htons(atoi(argv[2])); /* Server port */
+    fprintf(stdout, "test4 %s\n", ip);
+    fprintf(stdout, "test5 %d\n", clientsock);
 
-    /* Get size of echoserver structure */
-    serverlen = sizeof(echoserver);
 
-    /* Bind that socket with the OS, to be able to receive messages on that socket */
-    result = bind(sock, (struct sockaddr *)&echoserver, serverlen);
-    if (result < 0)
-    {
-        err_sys("Error bind");
-    }
-
-    /* As a server we are in an infinite loop, waiting forever */
-    while (1)
-    {
-        /* Set the maximum size for address */
-        clientlen = sizeof(echoclient);
-
-        /* Receive a message from a particular client */
-        printf("Listening....\n");
-        received = recvfrom(sock, buffer, BUFFSIZE, 0, (struct sockaddr *)&echoclient, &clientlen);
-        if (received < 0)
-        {
-            err_sys("Error receiveing word from client");
-        }
-
-        /* Print client address */
-        fprintf(stderr, "Client: %s, Message: %s\n", inet_ntoa(echoclient.sin_addr), buffer);
-
-        /* Try to send echo word back to the client */
-        result = sendto(sock, buffer, received, 0, (struct sockaddr *)&echoclient, sizeof(echoclient));
-        if (result != received)
-        {
-            err_sys("Error writing message back to the client");
-        }
-    }
+    /* Call function to handle socket */
+    handle_client(clientsock);
+    fprintf(stdout, "test6\n");
+  }
 }
