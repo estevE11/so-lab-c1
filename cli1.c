@@ -6,7 +6,7 @@
 #include <unistd.h>
 #include <netinet/in.h>
 
-#define BUFFSIZE 5
+#define BUFFSIZE 255
 
 void err_sys(char *mess) { perror(mess); exit(1); }
 
@@ -41,8 +41,13 @@ int main(int argc, char *argv[]) {
     err_sys("Error connect");
   }
 
-  /* Just wait */
-  while (1);
+  /* Write to socket */
+  write(sock, argv[2], strlen(argv[2]) + 1);
+  fprintf(stdout, " sent \n");
+
+  /* Read from socket */
+  read(sock, buffer, BUFFSIZE);
+  fprintf(stdout, " %s ...done \n", buffer);
 
   /* Close socket */
   close(sock);
