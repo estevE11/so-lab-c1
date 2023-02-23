@@ -10,20 +10,14 @@
 
 void err_sys(char *mess) { perror(mess); exit(1); }
 
-int main(int argc, char *argv[]) {
+int create_socket(char* ip, char* port);
+
+int send_message(int socket, char* msg);
+
+int create_socket(char* ip, char* port) {
   struct sockaddr_in echoserver;
-  char buffer[BUFFSIZE];
-  unsigned int echolen;
   int sock, result;
-  int received = 0;
 
-  /* Check input arguments */
-  if (argc != 4) {
-    fprintf(stderr, "Usage: %s <ip_server> <word> <port>\n", argv[0]);
-    exit(1);
-  }
-
-  /* Try to create TCP socket */
   sock = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (sock < 0) {
     err_sys("Error socket");
@@ -32,8 +26,8 @@ int main(int argc, char *argv[]) {
   /* Set information for sockaddr_in */
   memset(&echoserver, 0, sizeof(echoserver));       /* Reset memory */
   echoserver.sin_family = AF_INET;                  /* Internet/IP */
-  echoserver.sin_addr.s_addr = inet_addr(argv[1]);  /* Server address */
-  echoserver.sin_port = htons(atoi(argv[3]));       /* Server port */
+  echoserver.sin_addr.s_addr = inet_addr(ip);  /* Server address */
+  echoserver.sin_port = htons(atoi(port));       /* Server port */
 
   /* Try to have a connection with the server */
   result = connect(sock, (struct sockaddr *) &echoserver, sizeof(echoserver));
@@ -41,16 +35,42 @@ int main(int argc, char *argv[]) {
     err_sys("Error connect");
   }
 
-  /* Write to socket */
-  write(sock, argv[2], strlen(argv[2]) + 1);
-  fprintf(stdout, " sent \n");
+  return sock;
+}
 
-  /* Read from socket */
-  read(sock, buffer, BUFFSIZE);
-  fprintf(stdout, " %s ...done \n", buffer);
+int send_message(int socket, char* msg) {
+  write(socket, msg, strlen(msg) + 1);
+}
 
-  /* Close socket */
-  close(sock);
+int main(int argc, char *argv[]) {
+
+  /* Check input arguments */
+  if (argc != 4) {
+    fprintf(stderr, "Usage: %s <ip_server> <word> <port>\n", argv[0]);
+    exit(1);
+  }
+
+  /* Try to create TCP socket */
+
+
+  char input[5]; 
+  do {
+    if(strcmp(input, "") != 0) {
+      int socket = create_socket(argv[1], argv[3]);
+      send_message(socket, input);
+
+      /* Read from socket */
+      //read(sock, buffer, BUFFSIZE);
+      //fprintf(stdout, " %s ...done \n", buffer);
+      /* Close socket */
+      close(socket);
+    }
+
+    printf("Enter a message: ");
+    scanf("%s", input);
+  } while(strcmp(input, "exit"));  
+
+
 
   exit(0);
 }
