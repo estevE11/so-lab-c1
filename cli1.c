@@ -52,24 +52,26 @@ int main(int argc, char *argv[]) {
 
   /* Try to create TCP socket */
 
+  int socket = create_socket(argv[1], argv[3]);
 
   char input[5]; 
   do {
     if(strcmp(input, "") != 0) {
-      int socket = create_socket(argv[1], argv[3]);
       send_message(socket, input);
 
       /* Read from socket */
       //read(sock, buffer, BUFFSIZE);
       //fprintf(stdout, " %s ...done \n", buffer);
-      /* Close socket */
-      close(socket);
     }
 
     printf("Enter a message: ");
     scanf("%s", input);
-  } while(strcmp(input, "exit"));  
+  } while(strcmp(input, "exit"));
 
+  send_message(socket, "/disc");
+
+  /* Close socket */
+  close(socket);
 
 
   exit(0);
