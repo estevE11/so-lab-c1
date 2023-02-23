@@ -13,6 +13,8 @@ void err_sys(char *mess) { perror(mess); exit(1); }
 
 int create_server_socket(char* port);
 
+int socket_listen(int socket, struct sockaddr_in echoclient);
+
 int create_server_socket(char* port) {
   struct sockaddr_in echoserver;
   int serversock, clientsock;
@@ -48,6 +50,19 @@ int create_server_socket(char* port) {
   return serversock;
 }
 
+int socket_listen(int socket, struct sockaddr_in echoclient) {
+  unsigned int clientlen = sizeof(echoclient);
+
+  int clientsock = accept(socket, (struct sockaddr *)&echoclient, &clientlen);
+  if (clientsock < 0)
+  {
+    err_sys("Error accept");
+  }
+  char *ip = inet_ntoa(echoclient.sin_addr);
+  fprintf(stdout, "Client: %s\n", ip);
+  return clientsock;
+}
+
 int main(int argc, char *argv[]) {
   struct sockaddr_in echoclient;
 
@@ -61,26 +76,18 @@ int main(int argc, char *argv[]) {
 
   /* As a server we are in an infinite loop, waiting forever */
   while (1) {
-    unsigned int clientlen = sizeof(echoclient);
 
     /* Wait for a connection from a client */
     printf("Listening...\n");
-    int clientsock = accept(serversock, (struct sockaddr *) &echoclient, &clientlen);
-    if (clientsock < 0) {
-      err_sys("Error accept");
-    }
-    char* ip = inet_ntoa(echoclient.sin_addr);
-    fprintf(stdout, "Client: %s\n", ip);
-
+    int clientsock = socket_listen(serversock, echoclient);
 
     char buffer[BUFFSIZE];
-    int received = -1;
 
     while(strcmp(buffer, "/disc")) {
       /* Read from socket */
       read(clientsock, &buffer[0], BUFFSIZE);
       if (strcmp(buffer, "") != 0)
-        printf("Message from client: %s\n", buffer);
+        printf("Client: %s\n", buffer);
     }
 
     /* Write to socket */
