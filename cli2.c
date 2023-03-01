@@ -100,7 +100,6 @@ int main(int argc, char *argv[]) {
       printf("You have found the right number in %d iterations!\n", it);
       break;
     }
-    // Calculamos el numero q tiene q ser
   }
 
   send_message(socket, "/disc");
