@@ -47,8 +47,7 @@ Hay que crear 3 archivos: **file3.c**, **cli3.c**,**ser3.c**
   - FILE: Archivo a leer
   - PORT: Puerto (opcional, def: 9999)
 - Cuando se inicia tiene que cargar el archivo y guardar el numero de caracteres de cada linia en un array igual que la actividad 2.
-- Las peticiones funcionan de 2 en 2. Es decir el cliente va tener que hacer 2 peticiones cuando quiera informacion.
-- Las dos respuestas:
+- Va ha haver 2 peticiones del cliente:
   1. El numero de linias que tiene el archivo
   2. El numero de caracteres de la linia que pida el cliente.
 - Ejecucion:
