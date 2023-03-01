@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
     printf("Listening...\n");
     int clientsock = socket_listen(serversock, echoclient);
 
-    char buffer[BUFFSIZE];
+    char buffer[BUFFSIZE] = "";
 
     srand(time(NULL));
     int number = rand() % 100;
