@@ -14,6 +14,8 @@ int create_socket(char* ip, char* port);
 
 int send_message(int socket, char* msg);
 
+int get_center(int a, int b);
+
 int create_socket(char* ip, char* port) {
   struct sockaddr_in echoserver;
   int sock, result;
@@ -43,6 +45,10 @@ int send_message(int socket, char* msg) {
   return 0;
 }
 
+int getcenter(int a, int b) {
+  return ((b - a) / 2 + a);
+}
+
 int main(int argc, char *argv[]) {
 
   /* Check input arguments */
@@ -55,7 +61,13 @@ int main(int argc, char *argv[]) {
 
   int socket = create_socket(argv[1], argv[3]);
 
-  char input[5]; 
+  int max = 100;
+  int x = max / 2;
+  int lo = 0, hi = max + 1;
+
+  int found = 0;
+
+  char input[5];
   do {
     if(strcmp(input, "") != 0) {
       send_message(socket, input);
