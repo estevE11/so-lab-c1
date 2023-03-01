@@ -86,9 +86,11 @@ int main(int argc, char *argv[]) {
 
     srand(time(NULL));
     int number = rand() % 100;
+    int it = 0;
 
     while(strcmp(buffer, "/disc")) {
       read(clientsock, &buffer[0], BUFFSIZE);
+      it++;
       int guess = atoi(buffer);
       if(guess > number) {
         char *msg = "-1";
@@ -101,6 +103,9 @@ int main(int argc, char *argv[]) {
         write(clientsock, msg, strlen(msg) + 1);
       }
     }
+
+    printf("The random number is %d\n", number);
+    printf("Client has found the right number in %d iterations\n", it-1);
 
     /* Close socket */
     close(clientsock);  

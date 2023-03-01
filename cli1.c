@@ -63,54 +63,46 @@ int main(int argc, char *argv[]) {
 
   int max = 100;
   int x = max / 2;
-  int lo = 0, hi = max + 1;
+  int lo = 0, hi = max;
 
   int found = 0;
 
   char input[5];
-  char response[BUFFSIZE] = "-1";
+  int response = -1;
+  int it = 0;
 
-  while(atoi(response) != 0) {
+  while(response != 0) {
+    it++;
     // Enviamos numero
     sprintf(input, "%d", x); // passar de string a int i guardar en "input"
     send_message(socket, input);
 
     // Respuesta
-    read(socket, response, BUFFSIZE);
-    fprintf(stdout, "%s", response);
+    char buffer[BUFFSIZE];
+    read(socket, buffer, BUFFSIZE);
 
-    int val = atoi(response);
+    response = atoi(buffer);
+    //fprintf(stdout, "%d", response);
 
     // calculate next number
-    if (val < 0) {
-      printf("The correct number is LOWER\n\n");
+    if (response < 0) {
+      printf("Selected number in the range [%d-%d]: %d\n", lo,hi,x);
+      printf("your choice is bigger than number: moving down interval\n\n");
       hi = x;
       x = getcenter(lo, x);
-    } else if (val > 0) {
-      printf("The correct number is HIGHER\n\n");
+    } else if (response > 0) {
+      printf("Selected number in the range [%d-%d]: %d\n", lo, hi, x);
+      printf("your choice is lower than number: moving up interval\n\n");
       lo = x;
       x = getcenter(x, hi);
     } else {
-      printf("The number is CORRECT!\n");
-      found = 1;
+      printf("%d, The number is CORRECT!\n", x);
+      printf("You have found the right number in %d iterations!\n", it);
       break;
     }
     // Calculamos el numero q tiene q ser
   }
-    /*
-    do {
-    if(strcmp(input, "") != 0) {
-      send_message(socket, input);
 
-      char buffer[BUFFSIZE];
-      read(socket, buffer, BUFFSIZE);
-      fprintf(stdout, "Server: %s\n", buffer);
-    }
-
-    printf("Guess the random number: ");
-    scanf("%s", input);
-  } while(strcmp(input, "exit"));
-*/
   send_message(socket, "/disc");
 
   /* Close socket */
