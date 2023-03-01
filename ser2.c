@@ -116,7 +116,7 @@ int* read_file_and_create_array(char* filename, int* lines) {
       printf("Listening...\n");
       int clientsock = socket_listen(serversock, echoclient);
 
-      char buffer[BUFFSIZE];
+      char buffer[BUFFSIZE] = "";
 
       srand(time(NULL));
       int number = line_lengths[rand() % num_lines];
