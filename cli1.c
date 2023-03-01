@@ -40,6 +40,7 @@ int create_socket(char* ip, char* port) {
 
 int send_message(int socket, char* msg) {
   write(socket, msg, strlen(msg) + 1);
+  return 0;
 }
 
 int main(int argc, char *argv[]) {

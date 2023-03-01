@@ -83,11 +83,17 @@ int main(int argc, char *argv[]) {
 
     char buffer[BUFFSIZE];
 
+    int number = 0;
+
     while(strcmp(buffer, "/disc")) {
       /* Read from socket */
       read(clientsock, &buffer[0], BUFFSIZE);
-      if (strcmp(buffer, "") != 0)
-        printf("Client: %s\n", buffer);
+      int guess = atoi(buffer);
+      if(guess == number) {
+        printf("Correct!\n");
+      } else
+        printf("Wrong!\n");
+      // printf("Client: %s\n", buffer);
     }
 
     /* Write to socket */
