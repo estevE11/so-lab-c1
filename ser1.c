@@ -91,13 +91,13 @@ int main(int argc, char *argv[]) {
       read(clientsock, &buffer[0], BUFFSIZE);
       int guess = atoi(buffer);
       if(guess > number) {
-        char *msg = "lower";
+        char *msg = "-1";
         write(clientsock, msg, strlen(msg) + 1);
       } else if (guess < number){
-        char *msg = "higher";
+        char *msg = "1";
         write(clientsock, msg, strlen(msg) + 1);
       } else {
-        char *msg = "correct";
+        char *msg = "0";
         write(clientsock, msg, strlen(msg) + 1);
       }
     }

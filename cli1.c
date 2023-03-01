@@ -68,11 +68,40 @@ int main(int argc, char *argv[]) {
   int found = 0;
 
   char input[5];
-  do {
+  char response[BUFFSIZE] = "-1";
+
+  while(atoi(response) != 0) {
+    // Enviamos numero
+    sprintf(input, "%d", x); // passar de string a int i guardar en "input"
+    send_message(socket, input);
+
+    // Respuesta
+    read(socket, response, BUFFSIZE);
+    fprintf(stdout, "%s", response);
+
+    int val = atoi(response);
+
+    // calculate next number
+    if (val < 0) {
+      printf("The correct number is LOWER\n\n");
+      hi = x;
+      x = getcenter(lo, x);
+    } else if (val > 0) {
+      printf("The correct number is HIGHER\n\n");
+      lo = x;
+      x = getcenter(x, hi);
+    } else {
+      printf("The number is CORRECT!\n");
+      found = 1;
+      break;
+    }
+    // Calculamos el numero q tiene q ser
+  }
+    /*
+    do {
     if(strcmp(input, "") != 0) {
       send_message(socket, input);
 
-      /* Read from socket */
       char buffer[BUFFSIZE];
       read(socket, buffer, BUFFSIZE);
       fprintf(stdout, "Server: %s\n", buffer);
@@ -81,7 +110,7 @@ int main(int argc, char *argv[]) {
     printf("Guess the random number: ");
     scanf("%s", input);
   } while(strcmp(input, "exit"));
-
+*/
   send_message(socket, "/disc");
 
   /* Close socket */
