@@ -105,9 +105,6 @@ int* read_file_and_create_array(char* filename, int* lines) {
 
     int num_lines = 0;
     int *line_lengths = read_file_and_create_array("x.txt", &num_lines);
-    for (int i = 0; i < num_lines; i++) {
-      printf("%d, ", line_lengths[i]);
-    }
 
     int serversock = create_server_socket(argv[1]);
 
@@ -122,7 +119,7 @@ int* read_file_and_create_array(char* filename, int* lines) {
       char buffer[BUFFSIZE];
 
       srand(time(NULL));
-      int number = rand() % 100;
+      int number = line_lengths[rand() % num_lines];
       int it = 0;
 
       while (strcmp(buffer, "/disc"))
