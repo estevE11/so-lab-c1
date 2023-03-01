@@ -61,11 +61,12 @@ int main(int argc, char *argv[]) {
       send_message(socket, input);
 
       /* Read from socket */
-      //read(sock, buffer, BUFFSIZE);
-      //fprintf(stdout, " %s ...done \n", buffer);
+      char buffer[BUFFSIZE];
+      read(socket, buffer, BUFFSIZE);
+      fprintf(stdout, "Server: %s\n", buffer);
     }
 
-    printf("Enter a message: ");
+    printf("Guess the random number: ");
     scanf("%s", input);
   } while(strcmp(input, "exit"));
 

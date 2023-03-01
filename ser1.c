@@ -5,9 +5,10 @@
 #include <string.h>
 #include <unistd.h>
 #include <netinet/in.h>
+#include <time.h>
 
 #define MAXPENDING 5    /* Maximum number of simultaneous connections */
-#define BUFFSIZE 5      /* Size of message to be reeived */
+#define BUFFSIZE 10      /* Size of message to be reeived */
 
 void err_sys(char *mess) { perror(mess); exit(1); }
 
@@ -83,21 +84,23 @@ int main(int argc, char *argv[]) {
 
     char buffer[BUFFSIZE];
 
-    int number = 0;
+    srand(time(NULL));
+    int number = rand() % 100;
 
     while(strcmp(buffer, "/disc")) {
-      /* Read from socket */
       read(clientsock, &buffer[0], BUFFSIZE);
       int guess = atoi(buffer);
-      if(guess == number) {
-        printf("Correct!\n");
-      } else
-        printf("Wrong!\n");
-      // printf("Client: %s\n", buffer);
+      if(guess > number) {
+        char *msg = "lower";
+        write(clientsock, msg, strlen(msg) + 1);
+      } else if (guess < number){
+        char *msg = "higher";
+        write(clientsock, msg, strlen(msg) + 1);
+      } else {
+        char *msg = "correct";
+        write(clientsock, msg, strlen(msg) + 1);
+      }
     }
-
-    /* Write to socket */
-    //write(clientsock, buffer, strlen(buffer) + 1);
 
     /* Close socket */
     close(clientsock);  
