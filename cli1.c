@@ -10,13 +10,13 @@
 
 void err_sys(char *mess) { perror(mess); exit(1); }
 
-int create_socket(char* ip, char* port);
+int create_socket(char* ip, int port);
 
 int send_message(int socket, char* msg);
 
 int get_center(int a, int b);
 
-int create_socket(char* ip, char* port) {
+int create_socket(char* ip, int port) {
   struct sockaddr_in echoserver;
   int sock, result;
 
@@ -29,7 +29,7 @@ int create_socket(char* ip, char* port) {
   memset(&echoserver, 0, sizeof(echoserver));       /* Reset memory */
   echoserver.sin_family = AF_INET;                  /* Internet/IP */
   echoserver.sin_addr.s_addr = inet_addr(ip);  /* Server address */
-  echoserver.sin_port = htons(atoi(port));       /* Server port */
+  echoserver.sin_port = htons(port);       /* Server port */
 
   /* Try to have a connection with the server */
   result = connect(sock, (struct sockaddr *) &echoserver, sizeof(echoserver));
@@ -52,14 +52,25 @@ int getcenter(int a, int b) {
 int main(int argc, char *argv[]) {
 
   /* Check input arguments */
-  if (argc != 3) {
+  if (argc > 3) {
     fprintf(stderr, "Usage: %s <ip_server> <port>\n", argv[0]);
+    fprintf(stderr, "Usage: %s (default ip=127.0.0.1) <port>\n", argv[0]);
+    fprintf(stderr, "Usage: %s (default ip=127.0.0.1) (default port=8888)\n", argv[0]);
     exit(1);
+  }
+
+  char *ip = "127.0.0.1";
+  int port = 8888;
+  if(argc > 1) {
+    port = atoi(argv[1]);
+  } else if(argc > 2) {
+    ip = argv[1];
+    port = atoi(argv[2]);
   }
 
   /* Try to create TCP socket */
 
-  int socket = create_socket(argv[1], argv[2]);
+  int socket = create_socket(ip, port);
 
   int max = 100;
   int x = max / 2;
