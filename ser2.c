@@ -92,46 +92,46 @@ int* read_file_and_create_array(char* filename, int* lines) {
     return line_lengths;
 }
 
-  int main(int argc, char *argv[])
+int main(int argc, char *argv[])
+{
+  struct sockaddr_in echoclient;
+
+  /* Check input arguments */
+  if (argc != 2)
   {
-    struct sockaddr_in echoclient;
+    fprintf(stderr, "Usage: %s <port>\n", argv[0]);
+    exit(1);
+  }
 
-    /* Check input arguments */
-    if (argc != 2)
+  int num_lines = 0;
+  int *line_lengths = read_file_and_create_array("x.txt", &num_lines);
+
+  int serversock = create_server_socket(argv[1]);
+
+  /* As a server we are in an infinite loop, waiting forever */
+  while (1)
+  {
+
+    /* Wait for a connection from a client */
+    printf("Listening...\n");
+    int clientsock = socket_listen(serversock, echoclient);
+
+    char buffer[BUFFSIZE] = "";
+
+    srand(time(NULL));
+    int number = line_lengths[rand() % num_lines];
+    int it = 0;
+
+    while (strcmp(buffer, "/disc"))
     {
-      fprintf(stderr, "Usage: %s <port>\n", argv[0]);
-      exit(1);
-    }
-
-    int num_lines = 0;
-    int *line_lengths = read_file_and_create_array("x.txt", &num_lines);
-
-    int serversock = create_server_socket(argv[1]);
-
-    /* As a server we are in an infinite loop, waiting forever */
-    while (1)
-    {
-
-      /* Wait for a connection from a client */
-      printf("Listening...\n");
-      int clientsock = socket_listen(serversock, echoclient);
-
-      char buffer[BUFFSIZE] = "";
-
-      srand(time(NULL));
-      int number = line_lengths[rand() % num_lines];
-      int it = 0;
-
-      while (strcmp(buffer, "/disc"))
+      read(clientsock, &buffer[0], BUFFSIZE);
+      it++;
+      int guess = atoi(buffer);
+      if (guess > number)
       {
-        read(clientsock, &buffer[0], BUFFSIZE);
-        it++;
-        int guess = atoi(buffer);
-        if (guess > number)
-        {
-          char *msg = "-1";
-          write(clientsock, msg, strlen(msg) + 1);
-        } else if (guess < number){
+        char *msg = "-1";
+        write(clientsock, msg, strlen(msg) + 1);
+      } else if (guess < number){
         char *msg = "1";
         write(clientsock, msg, strlen(msg) + 1);
       } else {

@@ -138,7 +138,6 @@ int* read_file_and_create_array(char* filename, int* lines) {
 
     int udp_socket = udp_create_client_socket("127.0.0.1", "8081", &echoserver);
     int result = udp_send_message(udp_socket, "buenas", echoserver);
-    printf("buenas: %d\n", result);
 
     int num_lines = 0;
     int *line_lengths = read_file_and_create_array("x.txt", &num_lines);

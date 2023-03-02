@@ -8,14 +8,12 @@
 
 #define BUFFSIZE 255
 
-void err_sys(char *mess)
-{
+void err_sys(char *mess) {
   perror(mess);
   exit(1);
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
   struct sockaddr_in echoserver, echoclient;
   unsigned int echolen, clientlen, serverlen;
   char buffer[BUFFSIZE];
@@ -23,16 +21,14 @@ int main(int argc, char *argv[])
   int received = 0;
 
   /* Check input arguments */
-  if (argc != 3)
-  {
+  if (argc != 3) {
     fprintf(stderr, "Usage: %s <ip_server> <port>\n", argv[0]);
     exit(1);
   }
 
   /* Create UDP socket */
   sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-  if (sock < 0)
-  {
+  if (sock < 0) {
     err_sys("Error socket");
   }
 
@@ -48,21 +44,18 @@ int main(int argc, char *argv[])
 
   /* Bind that socket with the OS, to be able to receive messages on that socket */
   result = bind(sock, (struct sockaddr *)&echoserver, serverlen);
-  if (result < 0)
-  {
+  if (result < 0) {
     err_sys("Error bind");
   }
 
   /* As a server we are in an infinite loop, waiting forever */
-  while (1)
-  {
+  while (1) {
     /* Set the maximum size for address */
     clientlen = sizeof(echoclient);
 
     /* Receive a message from a particular client */
     received = recvfrom(sock, buffer, BUFFSIZE, 0, (struct sockaddr *)&echoclient, &clientlen);
-    if (received < 0)
-    {
+    if (received < 0) {
       err_sys("Error receiveing word from client");
     }
 
@@ -74,8 +67,7 @@ int main(int argc, char *argv[])
 
     /* Try to send echo word back to the client */
     result = sendto(sock, buffer, received, 0, (struct sockaddr *)&echoclient, sizeof(echoclient));
-    if (result != received)
-    {
+    if (result != received) {
       err_sys("Error writing message back to the client");
     }
   }
