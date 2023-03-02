@@ -69,8 +69,8 @@ int main(int argc, char *argv[]) {
 
   /* Check input arguments */
   if (argc != 2 && argc != 1) {
-    fprintf(stderr, "Usage: %s\n", argv[0]);
-    fprintf(stderr, "Usage: %s <port> (default port is: 8888)\n", argv[0]);
+    fprintf(stderr, "Usage: %s (default port=8888)\n", argv[0]);
+    fprintf(stderr, "Usage: %s <port>\n", argv[0]);
     exit(1);
   }
 
