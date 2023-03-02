@@ -158,7 +158,7 @@ int udp_receive_message(int socket, char* buffer) {
       printf("The random line number is %d\n", line_number);
       char to_send[10];
       sprintf(to_send, "%d", line_number);
-      int udp_socket = udp_send_message("127.0.0.1", "8081", to_send);
+      int udp_socket = udp_send_message(argv[2], argv[1], to_send);
       char response[BUFFSIZE];
       udp_receive_message(udp_socket, response);
       int number = atoi(response);

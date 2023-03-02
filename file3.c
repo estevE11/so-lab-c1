@@ -52,10 +52,14 @@ int main(int argc, char *argv[]) {
   int received = 0;
 
   /* Check input arguments */
-  if (argc != 3) {
+  if (argc != 3 && argc != 2) {
     fprintf(stderr, "Usage: %s <file> <port>\n", argv[0]);
     exit(1);
   }
+
+  int port = 9999;
+  if(argc == 3)
+    port = atoi(argv[2]);
 
   int num_lines = 0;
   int *line_lengths = read_file_and_create_array(argv[1], &num_lines);
@@ -71,7 +75,7 @@ int main(int argc, char *argv[]) {
   echoserver.sin_family = AF_INET;                 /* Internet/IP */
   //echoserver.sin_addr.s_addr = inet_addr(argv[1]); /* Receive message only to that IP on server */
   // echoserver.sin_addr.s_addr = htonl(INADDR_ANY); /* Receive requests to any IP address valid on server */
-  echoserver.sin_port = htons(atoi(argv[2])); /* Server port */
+  echoserver.sin_port = htons(port); /* Server port */
 
   /* Get size of echoserver structure */
   serverlen = sizeof(echoserver);
