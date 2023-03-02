@@ -101,10 +101,9 @@ int main(int argc, char *argv[]) {
 
     if(strcmp(buffer, "lines") == 0) {
       sprintf(buffer, "%d", num_lines);
-    } else if(strcmp(buffer, "line") == 0) {
-      srand(time(NULL));
-      int number = line_lengths[rand() % num_lines];
-      sprintf(buffer, "%d", number);
+    } else {
+      int line_number = atoi(buffer);
+      sprintf(buffer, "%d", line_lengths[line_number]);
     }
     /* Try to send echo word back to the client */
     result = sendto(sock, buffer, received, 0, (struct sockaddr *)&echoclient, sizeof(echoclient));

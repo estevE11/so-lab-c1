@@ -153,11 +153,16 @@ int udp_receive_message(int socket, char* buffer) {
 
       char buffer[BUFFSIZE] = "";
 
-
-      int udp_socket = udp_send_message("127.0.0.1", "8081", "line");
+      srand(time(NULL));
+      int line_number = rand() % num_lines;
+      printf("Pidiendo linia %d", line_number);
+      char to_send[10];
+      sprintf(to_send, "%d", line_number);
+      int udp_socket = udp_send_message("127.0.0.1", "8081", to_send);
       char response[BUFFSIZE];
       udp_receive_message(udp_socket, response);
       int number = atoi(response);
+      
       int it = 0;
 
       while (strcmp(buffer, "/disc"))
