@@ -105,7 +105,7 @@ int udp_receive_message(int socket, char* buffer) {
   int clientlen = sizeof(echoclient);
 
   /* Wait for echo from server */
-  fprintf(stdout, "Server echo: ");
+  //fprintf(stdout, "Server echo: ");
   int received = recvfrom(socket, buffer, BUFFSIZE, 0, (struct sockaddr *)&echoclient, &clientlen);
 /*  if (received != echolen)
   {
@@ -125,9 +125,9 @@ int udp_receive_message(int socket, char* buffer) {
     struct sockaddr_in echoclient, echoserver;
 
     /* Check input arguments */
-    if (argc != 2)
+    if (argc != 4)
     {
-      fprintf(stderr, "Usge: %s <port>\n", argv[0]);
+      fprintf(stderr, "Usge: %s <port_udp> <ip_udp> <port_tcp>\n", argv[0]);
       exit(1);
     }
 
@@ -135,13 +135,13 @@ int udp_receive_message(int socket, char* buffer) {
 
     int num_lines = 0;
 
-    int udp_socket = udp_send_message("127.0.0.1", "8081", "lines");
+    int udp_socket = udp_send_message(argv[2], argv[1], "lines");
     char response[BUFFSIZE];
     udp_receive_message(udp_socket, response);
     num_lines = atoi(response);
-    printf("Got response: %d\n", num_lines);
+    printf("NUMBER OF LINES FROM SERVER UDP: %d\n", num_lines);
 
-    int serversock = tcp_create_server_socket(argv[1]);
+    int serversock = tcp_create_server_socket(argv[3]);
 
     /* As a server we are in an infinite loop, waiting forever */
     while (1)
@@ -155,14 +155,14 @@ int udp_receive_message(int socket, char* buffer) {
 
       srand(time(NULL));
       int line_number = rand() % num_lines;
-      printf("Pidiendo linia %d\n", line_number);
+      printf("The random line number is %d\n", line_number);
       char to_send[10];
       sprintf(to_send, "%d", line_number);
       int udp_socket = udp_send_message("127.0.0.1", "8081", to_send);
       char response[BUFFSIZE];
       udp_receive_message(udp_socket, response);
       int number = atoi(response);
-      
+
       int it = 0;
 
       while (strcmp(buffer, "/disc"))

@@ -82,6 +82,9 @@ int main(int argc, char *argv[]) {
     err_sys("Error bind");
   }
 
+  printf("process file %s\n", argv[1]);
+  printf("number of lines processed: %d\n", num_lines);
+  
   /* As a server we are in an infinite loop, waiting forever */
   while (1) {
     /* Set the maximum size for address */
@@ -96,13 +99,15 @@ int main(int argc, char *argv[]) {
     /* Terminate received buffer */
     buffer[received] = '\0';
 
+    // ip: inet_ntoa(echoclient.sin_addr)
     /* Print client address */
-    fprintf(stderr, "Client: %s, Message: %s\n", inet_ntoa(echoclient.sin_addr), buffer);
-
+    fprintf(stdout, "REQUEST FROM SERVER UDP: %s\n", inet_ntoa(echoclient.sin_addr));
     if(strcmp(buffer, "lines") == 0) {
+      printf("Number of lines in file: %d\n", num_lines);
       sprintf(buffer, "%d", num_lines);
     } else {
       int line_number = atoi(buffer);
+      printf("Random number: %d\n", line_number);
       sprintf(buffer, "%d", line_lengths[line_number]);
     }
     /* Try to send echo word back to the client */
