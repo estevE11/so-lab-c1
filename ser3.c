@@ -15,11 +15,11 @@
 
 void err_sys(char *mess) { perror(mess); exit(1); }
 
-int create_server_socket(char* port);
+int tcp_create_server_socket(char* port);
 
-int socket_listen(int socket, struct sockaddr_in echoclient);
+int tcp_socket_listen(int socket, struct sockaddr_in echoclient);
 
-int create_server_socket(char* port) {
+int tcp_create_server_socket(char* port) {
   struct sockaddr_in echoserver;
   int serversock, clientsock;
   int result;
@@ -54,7 +54,7 @@ int create_server_socket(char* port) {
   return serversock;
 }
 
-int socket_listen(int socket, struct sockaddr_in echoclient) {
+int tcp_socket_listen(int socket, struct sockaddr_in echoclient) {
   unsigned int clientlen = sizeof(echoclient);
 
   int clientsock = accept(socket, (struct sockaddr *)&echoclient, &clientlen);
@@ -106,7 +106,7 @@ int* read_file_and_create_array(char* filename, int* lines) {
     int num_lines = 0;
     int *line_lengths = read_file_and_create_array("x.txt", &num_lines);
 
-    int serversock = create_server_socket(argv[1]);
+    int serversock = tcp_create_server_socket(argv[1]);
 
     /* As a server we are in an infinite loop, waiting forever */
     while (1)
@@ -114,7 +114,7 @@ int* read_file_and_create_array(char* filename, int* lines) {
 
       /* Wait for a connection from a client */
       printf("Listening...\n");
-      int clientsock = socket_listen(serversock, echoclient);
+      int clientsock = tcp_socket_listen(serversock, echoclient);
 
       char buffer[BUFFSIZE] = "";
 
