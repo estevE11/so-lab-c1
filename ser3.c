@@ -19,9 +19,9 @@ int tcp_create_server_socket(char* port);
 
 int tcp_socket_listen(int socket, struct sockaddr_in echoclient);
 
-int udp_create_client_socket(char *ip, char *port, struct sockaddr_in *echoserver);
+int udp_send_message(char *ip, char *port, char *message);
 
-int udp_send_message(int socket, char *message, struct sockaddr_in echoserver);
+int udp_receive_message(int socket, char* buffer);
 
 int tcp_create_server_socket(char *port)
 {
@@ -72,7 +72,9 @@ int tcp_socket_listen(int socket, struct sockaddr_in echoclient) {
   return clientsock;
 }
 
-int udp_create_client_socket(char *ip, char *port, struct sockaddr_in *echoserver) {
+int udp_send_message(char *ip, char *port, char *message) {
+  struct sockaddr_in echoserver;
+
   /* Create UDP socket */
   int sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
   if (sock < 0)
@@ -81,49 +83,42 @@ int udp_create_client_socket(char *ip, char *port, struct sockaddr_in *echoserve
   }
 
   /* Configure/set socket address for the server */
-  memset(&echoserver, 0, sizeof(echoserver));      /* Erase the memory area */
-  (*echoserver).sin_family = AF_INET;                 /* Internet/IP */
-  (*echoserver).sin_addr.s_addr = inet_addr(ip);      /* IP address */
-  (*echoserver).sin_port = htons(atoi(port));         /* Server port */
+  memset(&echoserver, 0, sizeof(echoserver));    /* Erase the memory area */
+  echoserver.sin_family = AF_INET;            /* Internet/IP */
+  echoserver.sin_addr.s_addr = inet_addr(ip); /* IP address */
+  echoserver.sin_port = htons(atoi(port));    /* Server port */
 
-  return sock;
-}
-
-int udp_send_message(int socket, char *message, struct sockaddr_in echoserver) {
   /* Try to send the word to server */
   unsigned int echolen = strlen(message);
-  int result = sendto(socket, message, echolen, 0, (struct sockaddr *)&echoserver, sizeof(echoserver));
+  int result = sendto(sock, message, echolen, 0, (struct sockaddr *)&echoserver, sizeof(echoserver));
   if (result != echolen)
   {
     err_sys("error writing word on socket");
   }
-  return result;
+  return sock;
 }
 
-int* read_file_and_create_array(char* filename, int* lines) {
-    FILE *fp;
-    char buffer[MAX_LINE_LENGTH];
-    int* line_lengths;
-    int num_lines = 0;
+int udp_receive_message(int socket, char* buffer) {
+  struct sockaddr_in echoclient;
 
-    line_lengths = malloc(MAX_LINES * sizeof(int));
+  /* Set the maximum size of address to be received */
+  int clientlen = sizeof(echoclient);
 
-    fp = fopen(filename, "r");
+  /* Wait for echo from server */
+  fprintf(stdout, "Server echo: ");
+  int received = recvfrom(socket, buffer, BUFFSIZE, 0, (struct sockaddr *)&echoclient, &clientlen);
+/*  if (received != echolen)
+  {
+    err_sys("Error reading");
+  }
+*/
+  /* Terminate received buffer */
+  buffer[received] = '\0';
 
-    while (fgets(buffer, MAX_LINE_LENGTH, fp))
-    {
-      int line_length = strlen(buffer);
-      if (line_length > 0 && buffer[line_length - 1] == '\n')
-      {
-        line_length--;
-      }
-      line_lengths[num_lines++] = line_length;
-    }
-
-    fclose(fp);
-    *lines = num_lines;
-    return line_lengths;
+  return 0;
 }
+
+
 
   int main(int argc, char *argv[])
   {
@@ -136,11 +131,15 @@ int* read_file_and_create_array(char* filename, int* lines) {
       exit(1);
     }
 
-    int udp_socket = udp_create_client_socket("127.0.0.1", "8081", &echoserver);
-    int result = udp_send_message(udp_socket, "buenas", echoserver);
+    struct sockaddr_in udp_echoclient;
 
     int num_lines = 0;
-    int *line_lengths = read_file_and_create_array("x.txt", &num_lines);
+
+    int udp_socket = udp_send_message("127.0.0.1", "8081", "lines");
+    char response[BUFFSIZE];
+    udp_receive_message(udp_socket, response);
+    num_lines = atoi(response);
+    fprintf(stdout, "Got response: %d\n", num_lines);
 
     int serversock = tcp_create_server_socket(argv[1]);
 
@@ -154,8 +153,11 @@ int* read_file_and_create_array(char* filename, int* lines) {
 
       char buffer[BUFFSIZE] = "";
 
-      srand(time(NULL));
-      int number = line_lengths[rand() % num_lines];
+
+      int udp_socket = udp_send_message("127.0.0.1", "8081", "line");
+      char response[BUFFSIZE];
+      udp_receive_message(udp_socket, response);
+      int number = atoi(response);
       int it = 0;
 
       while (strcmp(buffer, "/disc"))

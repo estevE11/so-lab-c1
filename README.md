@@ -54,7 +54,7 @@ Hay que crear 3 archivos: **file3.c**, **cli3.c**,**ser3.c**
   - El servidor (file3.c) recive una conexion el cliente
   - El servidor envia el numero de linias del archivo
   - El cliente genera un numero aleatorio para escoger una de las linias y le envia el numero al servidor.
-  - El servidor devuelve el numero de caracteres que el cliente ha escogido.
+  - El servidor devuelve el numero de caracteres de la linia que el cliente ha escogido.
 
 **OJO: El cliente de file3.c es ser3.c (NO cli3.c)**
 

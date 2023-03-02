@@ -5,12 +5,43 @@
 #include <string.h>
 #include <unistd.h>
 #include <netinet/in.h>
+#include <time.h>
 
 #define BUFFSIZE 255
+
+#define MAX_LINES 1000
+#define MAX_LINE_LENGTH 255
 
 void err_sys(char *mess) {
   perror(mess);
   exit(1);
+}
+
+int *read_file_and_create_array(char *filename, int *lines);
+
+int *read_file_and_create_array(char *filename, int *lines) {
+  FILE *fp;
+  char buffer[MAX_LINE_LENGTH];
+  int *line_lengths;
+  int num_lines = 0;
+
+  line_lengths = malloc(MAX_LINES * sizeof(int));
+
+  fp = fopen(filename, "r");
+
+  while (fgets(buffer, MAX_LINE_LENGTH, fp))
+  {
+    int line_length = strlen(buffer);
+    if (line_length > 0 && buffer[line_length - 1] == '\n')
+    {
+      line_length--;
+    }
+    line_lengths[num_lines++] = line_length;
+  }
+
+  fclose(fp);
+  *lines = num_lines;
+  return line_lengths;
 }
 
 int main(int argc, char *argv[]) {
@@ -25,6 +56,9 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "Usage: %s <ip_server> <port>\n", argv[0]);
     exit(1);
   }
+
+  int num_lines = 0;
+  int *line_lengths = read_file_and_create_array("x.txt", &num_lines);
 
   /* Create UDP socket */
   sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -65,6 +99,13 @@ int main(int argc, char *argv[]) {
     /* Print client address */
     fprintf(stderr, "Client: %s, Message: %s\n", inet_ntoa(echoclient.sin_addr), buffer);
 
+    if(strcmp(buffer, "lines") == 0) {
+      sprintf(buffer, "%d", num_lines);
+    } else if(strcmp(buffer, "line") == 0) {
+      srand(time(NULL));
+      int number = line_lengths[rand() % num_lines];
+      sprintf(buffer, "%d", number);
+    }
     /* Try to send echo word back to the client */
     result = sendto(sock, buffer, received, 0, (struct sockaddr *)&echoclient, sizeof(echoclient));
     if (result != received) {
