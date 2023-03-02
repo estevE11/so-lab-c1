@@ -125,16 +125,17 @@ int udp_receive_message(int socket, char* buffer) {
     struct sockaddr_in echoclient, echoserver;
 
     /* Check input arguments */
-    if (argc != 4 && argc != 3)
-    {
-    fprintf(stderr, "Usge: %s <port_udp> <ip_udp> (default port_tcp=9999)\n", argv[0]);
-    fprintf(stderr, "Usge: %s <port_udp> <ip_udp> <port_tcp>\n", argv[0]);
-    exit(1);
+    if (argc != 4 && argc != 3) {
+      fprintf(stderr, "Usge: %s <port_udp> <ip_udp> (default port_tcp=9999)\n", argv[0]);
+      fprintf(stderr, "Usge: %s <port_udp> <ip_udp> <port_tcp>\n", argv[0]);
+      exit(1);
     }
 
     int port = 9999;
-    if(argc == 3)
+    if(argc == 4)
       port = atoi(argv[3]);
+
+    fprintf(stdout, "%d", port);
 
     struct sockaddr_in udp_echoclient;
 
