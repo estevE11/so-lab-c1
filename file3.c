@@ -53,12 +53,12 @@ int main(int argc, char *argv[]) {
 
   /* Check input arguments */
   if (argc != 3) {
-    fprintf(stderr, "Usage: %s <ip_server> <port>\n", argv[0]);
+    fprintf(stderr, "Usage: %s <file> <port>\n", argv[0]);
     exit(1);
   }
 
   int num_lines = 0;
-  int *line_lengths = read_file_and_create_array("x.txt", &num_lines);
+  int *line_lengths = read_file_and_create_array(argv[1], &num_lines);
 
   /* Create UDP socket */
   sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
   /* Prepare sockaddr_in structure for server address */
   memset(&echoserver, 0, sizeof(echoserver));      /* Erase the memory area */
   echoserver.sin_family = AF_INET;                 /* Internet/IP */
-  echoserver.sin_addr.s_addr = inet_addr(argv[1]); /* Receive message only to that IP on server */
+  //echoserver.sin_addr.s_addr = inet_addr(argv[1]); /* Receive message only to that IP on server */
   // echoserver.sin_addr.s_addr = htonl(INADDR_ANY); /* Receive requests to any IP address valid on server */
   echoserver.sin_port = htons(atoi(argv[2])); /* Server port */
 

@@ -139,7 +139,7 @@ int udp_receive_message(int socket, char* buffer) {
     char response[BUFFSIZE];
     udp_receive_message(udp_socket, response);
     num_lines = atoi(response);
-    fprintf(stdout, "Got response: %d\n", num_lines);
+    printf("Got response: %d\n", num_lines);
 
     int serversock = tcp_create_server_socket(argv[1]);
 
@@ -155,7 +155,7 @@ int udp_receive_message(int socket, char* buffer) {
 
       srand(time(NULL));
       int line_number = rand() % num_lines;
-      printf("Pidiendo linia %d", line_number);
+      printf("Pidiendo linia %d\n", line_number);
       char to_send[10];
       sprintf(to_send, "%d", line_number);
       int udp_socket = udp_send_message("127.0.0.1", "8081", to_send);
@@ -183,7 +183,7 @@ int udp_receive_message(int socket, char* buffer) {
       }
     }
 
-    printf("The random number is %d\n", number);
+    printf("\nThe random number is %d\n", number);
     printf("Client has found the right number in %d iterations\n", it-1);
 
     /* Close socket */
