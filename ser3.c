@@ -131,11 +131,9 @@ int udp_receive_message(int socket, char* buffer) {
       exit(1);
     }
 
-    int port = 9999;
+    int port = 8888;
     if(argc == 4)
       port = atoi(argv[3]);
-
-    fprintf(stdout, "%d", port);
 
     struct sockaddr_in udp_echoclient;
 
