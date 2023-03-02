@@ -52,14 +52,14 @@ int getcenter(int a, int b) {
 int main(int argc, char *argv[]) {
 
   /* Check input arguments */
-  if (argc != 4) {
-    fprintf(stderr, "Usage: %s <ip_server> <word> <port>\n", argv[0]);
+  if (argc != 3) {
+    fprintf(stderr, "Usage: %s <ip_server> <port>\n", argv[0]);
     exit(1);
   }
 
   /* Try to create TCP socket */
 
-  int socket = create_socket(argv[1], argv[3]);
+  int socket = create_socket(argv[1], argv[2]);
 
   int max = 100;
   int x = max / 2;
