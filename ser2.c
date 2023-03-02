@@ -15,11 +15,11 @@
 
 void err_sys(char *mess) { perror(mess); exit(1); }
 
-int create_server_socket(char* port);
+int create_server_socket(int port);
 
 int socket_listen(int socket, struct sockaddr_in echoclient);
 
-int create_server_socket(char* port) {
+int create_server_socket(int port) {
   struct sockaddr_in echoserver;
   int serversock, clientsock;
   int result;
@@ -35,7 +35,7 @@ int create_server_socket(char* port) {
   memset(&echoserver, 0, sizeof(echoserver));     /* Reset memory */
   echoserver.sin_family = AF_INET;                /* Internet/IP */
   echoserver.sin_addr.s_addr = htonl(INADDR_ANY); /* Any address */
-  echoserver.sin_port = htons(atoi(port));     /* Server port */
+  echoserver.sin_port = htons(port);     /* Server port */
 
   /* Bind socket */
   result = bind(serversock, (struct sockaddr *)&echoserver, sizeof(echoserver));
@@ -97,16 +97,22 @@ int main(int argc, char *argv[])
   struct sockaddr_in echoclient;
 
   /* Check input arguments */
-  if (argc != 2)
+  if (argc != 2 && argc != 1)
   {
-    fprintf(stderr, "Usage: %s <port>\n", argv[0]);
-    exit(1);
+      fprintf(stderr, "Usage: %s\n", argv[0]);
+      fprintf(stderr, "Usage: %s <port> (default port is: 8888)\n", argv[0]);
+      exit(1);
+  }
+
+  int port = 8888;
+  if (argc == 2)
+  {
+      port = atoi(argv[1]);
   }
 
   int num_lines = 0;
   int *line_lengths = read_file_and_create_array("x.txt", &num_lines);
-
-  int serversock = create_server_socket(argv[1]);
+  int serversock = create_server_socket(port);
 
   /* As a server we are in an infinite loop, waiting forever */
   while (1)
