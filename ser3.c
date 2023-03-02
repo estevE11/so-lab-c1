@@ -15,7 +15,7 @@
 
 void err_sys(char *mess) { perror(mess); exit(1); }
 
-int tcp_create_server_socket(char* port);
+int tcp_create_server_socket(int port);
 
 int tcp_socket_listen(int socket, struct sockaddr_in echoclient);
 
@@ -23,7 +23,7 @@ int udp_send_message(char *ip, char *port, char *message);
 
 int udp_receive_message(int socket, char* buffer);
 
-int tcp_create_server_socket(char *port)
+int tcp_create_server_socket(int port)
 {
   struct sockaddr_in echoserver;
   int serversock, clientsock;
@@ -40,7 +40,7 @@ int tcp_create_server_socket(char *port)
   memset(&echoserver, 0, sizeof(echoserver));     /* Reset memory */
   echoserver.sin_family = AF_INET;                /* Internet/IP */
   echoserver.sin_addr.s_addr = htonl(INADDR_ANY); /* Any address */
-  echoserver.sin_port = htons(atoi(port));     /* Server port */
+  echoserver.sin_port = htons(port);     /* Server port */
 
   /* Bind socket */
   result = bind(serversock, (struct sockaddr *)&echoserver, sizeof(echoserver));
@@ -125,11 +125,16 @@ int udp_receive_message(int socket, char* buffer) {
     struct sockaddr_in echoclient, echoserver;
 
     /* Check input arguments */
-    if (argc != 4)
+    if (argc != 4 && argc != 3)
     {
-      fprintf(stderr, "Usge: %s <port_udp> <ip_udp> <port_tcp>\n", argv[0]);
-      exit(1);
+    fprintf(stderr, "Usge: %s <port_udp> <ip_udp> (default port_tcp=9999)\n", argv[0]);
+    fprintf(stderr, "Usge: %s <port_udp> <ip_udp> <port_tcp>\n", argv[0]);
+    exit(1);
     }
+
+    int port = 9999;
+    if(argc == 3)
+      port = atoi(argv[3]);
 
     struct sockaddr_in udp_echoclient;
 
@@ -141,7 +146,7 @@ int udp_receive_message(int socket, char* buffer) {
     num_lines = atoi(response);
     printf("NUMBER OF LINES FROM SERVER UDP: %d\n", num_lines);
 
-    int serversock = tcp_create_server_socket(argv[3]);
+    int serversock = tcp_create_server_socket(port);
 
     /* As a server we are in an infinite loop, waiting forever */
     while (1)
